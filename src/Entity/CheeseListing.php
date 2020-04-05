@@ -2,13 +2,35 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Carbon\Carbon;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={
+ *          "get",
+ *          "put",
+ *          "delete"},
+ *     shortName="cheeses",
+ *     normalizationContext={"groups"={"cheese_listing:read"}},
+ *     denormalizationContext={"groups"={"cheese_listing:write"}}
+ *
+ * )
+ *
+ * @ApiFilter(BooleanFilter::class, properties={"isPublished"})
+ * @ApiFilter(SearchFilter::class, properties={"title": "partial"})
+ *
  * @ORM\Entity(repositoryClass="App\Repository\CheeseListingRepository")
  */
+// TODO: Tester les differents filtres : click SearchFidlter > explore directory
 class CheeseListing
 {
     /**
@@ -20,16 +42,19 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"cheese_listing:read", "cheese_listing:write"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"cheese_listing:read"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"cheese_listing:read", "cheese_listing:write"})
      */
     private $price;
 
@@ -41,7 +66,13 @@ class CheeseListing
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isPublished;
+    private $isPublished = false;
+
+    public function __construct(string $title = null)
+    {
+        $this->title = $title;
+        $this->createdAt = new DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -53,13 +84,6 @@ class CheeseListing
         return $this->title;
     }
 
-    public function setTitle(string $title): self
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -69,6 +93,18 @@ class CheeseListing
     {
         $this->description = $description;
 
+        return $this;
+    }
+
+    /**
+     * The description of the cheese as raw text.
+     *
+     * @Groups("cheese_listing:write")
+     * @SerializedName("description")
+     */
+    public function setTextDescription(string $description): self
+    {
+        $this->description = nl2br($description);
         return $this;
     }
 
@@ -89,11 +125,14 @@ class CheeseListing
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    /**
+     * How long ago in text that this cheese listing was added.
+     *
+     * @Groups("cheese_listing:read")
+     */
+    public function getCreatedAtAgo(): string
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function getIsPublished(): ?bool
