@@ -7,6 +7,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,6 +30,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  * @ApiFilter(BooleanFilter::class, properties={"isPublished"})
  * @ApiFilter(SearchFilter::class, properties={"title": "partial"})
  * @ApiFilter(RangeFilter::class, properties={"price"})
+ * @ApiFilter(PropertyFilter::class)
  *
  * @ORM\Entity(repositoryClass="App\Repository\CheeseListingRepository")
  */
@@ -92,6 +94,8 @@ class CheeseListing
     }
 
     /**
+     * Adds ellipsis to a more than 40 char description
+     *
      * @Groups("cheese_listing:read")
      */
     public function getShortDescription(): ?string
