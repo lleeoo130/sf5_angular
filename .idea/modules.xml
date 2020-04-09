@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/sf5_angular.iml" filepath="$PROJECT_DIR$/.idea/sf5_angular.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../test-app/.idea/test-app.iml" filepath="$PROJECT_DIR$/../test-app/.idea/test-app.iml" />
     </modules>
   </component>
 </project>
