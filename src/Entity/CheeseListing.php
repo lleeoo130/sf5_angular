@@ -45,6 +45,9 @@ class CheeseListing
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
+     *
+     * @Groups({"cheese_listing:read"})
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
