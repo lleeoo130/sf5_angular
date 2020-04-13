@@ -99,6 +99,13 @@ class CheeseListing
         $this->createdAt = new DateTimeImmutable();
     }
 
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
